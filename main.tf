@@ -10,18 +10,8 @@ variable "subnet_id" {}
 variable "ansible_repo_path" {}
 variable "pub_key_path" {}
 variable "pvt_key_path" {}
-variable "search_display_name" {
-  default = "search"
-}
-variable "dns_display_name" {
-  default = "dns"
-}
-variable "search_ip" {
-  default = "10.0.10.2"
-}
-variable "dns_ip" {
-  default = "10.0.10.3"
-}
+variable "instances" {}
+
 variable "user" {
   default = "opc"
 }
@@ -34,24 +24,14 @@ provider "oci" {
   region           = var.region
 }
 
-module "instance" {
+module "oci-free" {
   source = "./oci-free"
   compartment_ocid = var.compartment_ocid
   ansible_repo_path = "${var.ansible_repo_path}"
   pub_key_path = var.pub_key_path
   pvt_key_path = var.pvt_key_path
   subnet_id = var.subnet_id
-  display_name = var.search_display_name
-  ip = var.search_ip
-}
-
-module "dns" {
-  source = "./oci-free"
-  compartment_ocid = var.compartment_ocid
-  ansible_repo_path = "${var.ansible_repo_path}"
-  pub_key_path = var.pub_key_path
-  pvt_key_path = var.pvt_key_path
-  subnet_id = var.subnet_id
-  display_name = var.dns_display_name
-  ip = var.dns_ip
+  for_each = {for name, ip in var.instances: name => ip}
+  display_name = each.key
+  ip = each.value
 }
