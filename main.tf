@@ -52,13 +52,99 @@ resource "oci_core_default_route_table" "route_table" {
   }
 
   dynamic "route_rules" {
-    for_each = toset(flatten([for s in var.cpes : s["routes"]]))
+    for_each = toset(concat(flatten([for s in var.cpes : s["routes"]]), var.vpn_routes))
     content {
       #Required
       network_entity_id = oci_core_drg.drg.id
       #Optional
       destination       = route_rules.key
       destination_type  = "CIDR_BLOCK"
+    }
+  }
+}
+
+resource "oci_core_default_security_list" "security_list" {
+  compartment_id             = var.compartment_id
+  manage_default_resource_id = oci_core_vcn.vcn.default_security_list_id
+  ingress_security_rules {
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    description = "Allow SSH"
+    tcp_options {
+      min = 22
+      max = 22
+    }
+  }
+  ingress_security_rules {
+    protocol    = "6"
+    source      = "0.0.0.0/0"
+    description = "Allow Wireguard"
+    tcp_options {
+      min = var.wireguard_port
+      max = var.wireguard_port
+    }
+  }
+  ingress_security_rules {
+    protocol    = "17"
+    source      = "0.0.0.0/0"
+    description = "Allow Wireguard"
+    udp_options {
+      min = var.wireguard_port
+      max = var.wireguard_port
+    }
+  }
+
+  egress_security_rules {
+    destination = "0.0.0.0/0"
+    protocol    = "all"
+  }
+
+  dynamic "ingress_security_rules" {
+    for_each = toset(concat(var.personal_networks, var.work_networks, var.iot_networks))
+    content {
+      protocol    = "17"
+      source      = ingress_security_rules.key
+      description = "Allow DNS"
+      udp_options {
+        min = 53
+        max = 53
+      }
+    }
+  }
+  dynamic "ingress_security_rules" {
+    for_each = toset(var.personal_networks)
+    content {
+      protocol    = "6"
+      source      = ingress_security_rules.key
+      description = "Allow HTTP"
+      tcp_options {
+        min = 80
+        max = 80
+      }
+    }
+  }
+  dynamic "ingress_security_rules" {
+    for_each = toset(var.personal_networks)
+    content {
+      protocol    = "6"
+      source      = ingress_security_rules.key
+      description = "Allow HTTPS"
+      tcp_options {
+        min = 443
+        max = 443
+      }
+    }
+  }
+  dynamic "ingress_security_rules" {
+    for_each = toset(var.personal_networks)
+    content {
+      protocol    = "6"
+      source      = ingress_security_rules.key
+      description = "Allow Traefik Dashboard"
+      tcp_options {
+        min = 8080
+        max = 8080
+      }
     }
   }
 }
@@ -185,7 +271,7 @@ terraform {
     key                         = "terraform/terraform.tfstate"
     region                      = "us-phoenix-1"
     endpoint                    = "https://axe3byclj986.compat.objectstorage.us-phoenix-1.oraclecloud.com"
-    shared_credentials_file     = "./backend_creds"
+    shared_credentials_file     = "~/.oci/aws_creds"
     skip_region_validation      = true
     skip_credentials_validation = true
     skip_metadata_api_check     = true

@@ -28,3 +28,10 @@ variable "user" {
 variable "ig_enabled" {
   default = true
 }
+variable "wireguard_port" {
+  default = 51820
+}
+variable "vpn_routes" {}
+variable "personal_networks" {}
+variable "work_networks" {}
+variable "iot_networks" {}
