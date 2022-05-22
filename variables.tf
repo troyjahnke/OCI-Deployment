@@ -1,4 +1,5 @@
 variable "compartment_id" {}
+variable "config_file_profile" {}
 variable "user_ocid" {}
 variable "fingerprint" {}
 variable "oci_private_key_path" {}
