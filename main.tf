@@ -1,9 +1,6 @@
 provider "oci" {
-  tenancy_ocid     = var.compartment_id
-  user_ocid        = var.user_ocid
-  fingerprint      = var.fingerprint
-  private_key_path = var.oci_private_key_path
-  region           = var.region
+  tenancy_ocid        = var.compartment_id
+  config_file_profile = var.config_file_profile
 }
 
 resource "oci_core_vcn" "vcn" {
@@ -145,6 +142,14 @@ resource "oci_core_default_security_list" "security_list" {
         min = 8080
         max = 8080
       }
+    }
+  }
+  dynamic "ingress_security_rules" {
+    for_each = toset(var.personal_networks)
+    content {
+      protocol    = "1"
+      source      = ingress_security_rules.key
+      description = "Allow ICMP"
     }
   }
 }
