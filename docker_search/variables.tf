@@ -1,6 +1,6 @@
 # Public variables
 variable "traefik_version" {
-  default = "v2.6.3"
+  default = "v2.7.1"
 }
 variable "tz" {
   default = "America/Denver"
