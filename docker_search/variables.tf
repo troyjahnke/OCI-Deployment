@@ -2,6 +2,9 @@
 variable "traefik_version" {
   default = "v2.7.1"
 }
+variable whoogle_version{
+  default = "0.7.4"
+}
 variable "tz" {
   default = "America/Denver"
 }

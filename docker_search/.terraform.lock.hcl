@@ -6,6 +6,7 @@ provider "registry.terraform.io/kreuzwerker/docker" {
   hashes = [
     "h1:FyU8TUgpwfu+O+k+Uu5N58I/JWlEZk2PzQLJMluuaIQ=",
     "h1:OcTn2QyCQNjDiJYy1vqQFmz2dxJdOF/2/HBXBvGxU2E=",
+    "h1:gDd3kCA3sMDsH8Mb+Q19LWguBJ5I12NDPpMbUsZGv7w=",
     "zh:0ff8aa7884c6dae90e6f245bb9d37898735f89e095ba53413f2f364db4d11a77",
     "zh:4101f4c909477f3a8225829b7063e5c5a2e2986a6163e0f113af040b5feab61f",
     "zh:59db110d2b6c620cc12a1741d81ed8d1dd7fb0540024428fefbb57e8bebe5b60",

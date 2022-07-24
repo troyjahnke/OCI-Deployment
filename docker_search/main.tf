@@ -17,8 +17,8 @@ resource "docker_network" "search" {
 resource "docker_image" "traefik" {
   name = "traefik:${var.traefik_version}"
 }
-resource "docker_image" "searxng" {
-  name = "searxng/searxng:latest"
+resource "docker_image" "whoogle" {
+  name = "benbusby/whoogle-search:${var.whoogle_version}"
 }
 
 resource "docker_container" "traefik" {
@@ -59,12 +59,12 @@ resource "docker_container" "traefik" {
     }
   }
 }
-resource "docker_container" "searxng" {
-  image = docker_image.searxng.latest
+resource "docker_container" "whoogle" {
+  image = docker_image.whoogle.latest
   networks_advanced {
     name = docker_network.search.name
   }
-  name  = "searxng"
+  name  = "whoogle"
   restart = "unless-stopped"
 
   dynamic "labels" {
