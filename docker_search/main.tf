@@ -67,6 +67,13 @@ resource "docker_container" "whoogle" {
   name  = "whoogle"
   restart = "unless-stopped"
 
+  env = [
+    "WHOOGLE_CONFIG_URL=${var.whoogle_config_url}",
+    "WHOOGLE_CONFIG_LANGUAGE=${var.whoogle_language}",
+    "WHOOGLE_CONFIG_SEARCH_LANGUAGE=${var.whoogle_language}",
+    "WHOOGLE_CONFIG_COUNTRY=${var.whoogle_country}"
+  ]
+
   dynamic "labels" {
     for_each = var.search_labels
     content {

@@ -8,6 +8,12 @@ variable whoogle_version{
 variable "tz" {
   default = "America/Denver"
 }
+variable "whoogle_language" {
+  default = "lang_en"
+}
+variable "whoogle_country" {
+  default = "US"
+}
 
 # Private variables
 variable "docker_host" {}
@@ -15,3 +21,4 @@ variable "search_labels" {}
 variable "cert_path" {}
 variable "traefik_config_path" {}
 variable "pvt_key_path" {}
+variable "whoogle_config_url" {}
