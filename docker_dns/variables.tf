@@ -1,9 +1,9 @@
 # Public variables
 variable "cloudflared_version" {
-  default = "2022.6.2"
+  default = "2022.8.0"
 }
 variable "pihole_version" {
-  default = "2022.05"
+  default = "2022.07.1"
 }
 variable "tz" {
   default = "America/Denver"
