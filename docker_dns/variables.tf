@@ -1,6 +1,6 @@
 # Public variables
 variable "cloudflared_version" {
-  default = "2022.8.0"
+  default = "2022.8.2-amd64"
 }
 variable "pihole_version" {
   default = "2022.07.1"
