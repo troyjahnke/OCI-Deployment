@@ -1,8 +1,8 @@
 # Public variables
 variable "traefik_version" {
-  default = "v2.8.3"
+  default = "v2.8.5"
 }
-variable whoogle_version{
+variable "whoogle_version" {
   default = "0.7.4"
 }
 variable "tz" {
