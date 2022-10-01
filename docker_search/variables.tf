@@ -1,6 +1,6 @@
 # Public variables
 variable "traefik_version" {
-  default = "v2.8.5"
+  default = "v2.8.8"
 }
 variable "whoogle_version" {
   default = "0.7.4"

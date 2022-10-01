@@ -1,13 +1,13 @@
 terraform {
   required_providers {
     docker = {
-      source  = "kreuzwerker/docker"
+      source = "kreuzwerker/docker"
     }
   }
 }
 
 provider "docker" {
-  host = var.docker_host
+  host     = var.docker_host
   ssh_opts = ["-i", var.pvt_key_path]
 }
 
@@ -21,22 +21,22 @@ resource "docker_image" "cloudflared" {
 
 resource "docker_volume" "pihole" {
   for_each = toset(["pihole-config", "pihole-dnsmasq-config"])
-  name = each.key
+  name     = each.key
 }
 
 resource "docker_container" "cloudflared" {
-  image = docker_image.cloudflared.latest
-  name  = "cloudflared"
+  image        = docker_image.cloudflared.image_id
+  name         = "cloudflared"
   network_mode = "host"
-  restart = "unless-stopped"
-  command = ["proxy-dns", "--port", "5053"]
+  restart      = "unless-stopped"
+  command      = ["proxy-dns", "--port", "5053"]
 }
 
 resource "docker_container" "pihole" {
-  image = docker_image.pihole.latest
-  name  = "pihole"
+  image        = docker_image.pihole.image_id
+  name         = "pihole"
   network_mode = "host"
-  restart = "unless-stopped"
+  restart      = "unless-stopped"
   env = [
     "TZ=${var.tz}",
     "PIHOLE_DNS_=;127.0.0.1#5053",
@@ -46,11 +46,11 @@ resource "docker_container" "pihole" {
   ]
   volumes {
     container_path = "/etc/pihole/"
-    volume_name = docker_volume.pihole["pihole-config"].name
+    volume_name    = docker_volume.pihole["pihole-config"].name
   }
   volumes {
     container_path = "/etc/dnsmasq.d/"
-    volume_name = docker_volume.pihole["pihole-dnsmasq-config"].name
+    volume_name    = docker_volume.pihole["pihole-dnsmasq-config"].name
   }
 }
 
@@ -67,3 +67,4 @@ terraform {
     force_path_style            = true
   }
 }
+

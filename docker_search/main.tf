@@ -1,13 +1,13 @@
 terraform {
   required_providers {
     docker = {
-      source  = "kreuzwerker/docker"
+      source = "kreuzwerker/docker"
     }
   }
 }
 
 provider "docker" {
-  host = var.docker_host
+  host     = var.docker_host
   ssh_opts = ["-i", var.pvt_key_path]
 }
 resource "docker_network" "search" {
@@ -22,31 +22,31 @@ resource "docker_image" "whoogle" {
 }
 
 resource "docker_container" "traefik" {
-  image = docker_image.traefik.latest
+  image = docker_image.traefik.image_id
   networks_advanced {
     name = docker_network.search.name
   }
-  name  = "traefik"
+  name    = "traefik"
   restart = "unless-stopped"
 
   command = [
-      # "--log.level=DEBUG",
-      "--api.insecure=true",
-      "--providers.docker=true",
-      "--providers.docker.exposedbydefault=false",
-      "--entrypoints.https.address=:443",
-      "--providers.file.directory=/config/"
+    # "--log.level=DEBUG",
+    "--api.insecure=true",
+    "--providers.docker=true",
+    "--providers.docker.exposedbydefault=false",
+    "--entrypoints.https.address=:443",
+    "--providers.file.directory=/config/"
   ]
   volumes {
     container_path = "/var/run/docker.sock"
-    host_path = "/var/run/docker.sock"
+    host_path      = "/var/run/docker.sock"
   }
   volumes {
-    host_path = var.cert_path
+    host_path      = var.cert_path
     container_path = "/certs"
   }
   volumes {
-    host_path = var.traefik_config_path
+    host_path      = var.traefik_config_path
     container_path = "/config"
   }
 
@@ -60,11 +60,11 @@ resource "docker_container" "traefik" {
   }
 }
 resource "docker_container" "whoogle" {
-  image = docker_image.whoogle.latest
+  image = docker_image.whoogle.image_id
   networks_advanced {
     name = docker_network.search.name
   }
-  name  = "whoogle"
+  name    = "whoogle"
   restart = "unless-stopped"
 
   env = [
@@ -96,3 +96,4 @@ terraform {
     force_path_style            = true
   }
 }
+
