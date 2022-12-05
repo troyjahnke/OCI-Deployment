@@ -54,8 +54,8 @@ resource "oci_core_default_route_table" "route_table" {
       #Required
       network_entity_id = oci_core_drg.drg.id
       #Optional
-      destination       = route_rules.key
-      destination_type  = "CIDR_BLOCK"
+      destination      = route_rules.key
+      destination_type = "CIDR_BLOCK"
     }
   }
 }
@@ -132,6 +132,19 @@ resource "oci_core_default_security_list" "security_list" {
       }
     }
   }
+
+  dynamic "ingress_security_rules" {
+    for_each = toset(var.personal_networks)
+    content {
+      protocol = "6"
+      source = ingress_security_rules.key
+      description = "Allow Adguard initial port"
+      tcp_options {
+        min = 3000
+        max = 3000
+      }
+    }
+  }
   dynamic "ingress_security_rules" {
     for_each = toset(var.personal_networks)
     content {
@@ -165,12 +178,12 @@ resource "oci_core_drg_attachment" "drg_attachment" {
 }
 
 resource "oci_core_cpe" "cpe" {
-  for_each       = var.cpes
+  for_each = var.cpes
   #Required
   compartment_id = var.compartment_id
   ip_address     = each.value["ip"]
   #Optional
-  display_name   = each.key
+  display_name = each.key
 }
 
 resource "oci_core_ipsec" "ipsec" {
@@ -196,10 +209,10 @@ resource "oci_core_ipsec_connection_tunnel_management" "test_ip_sec_connection_t
   for_each = var.cpes
   #Required
   ipsec_id = oci_core_ipsec.ipsec[
-  each.key
+    each.key
   ].id
   tunnel_id = data.oci_core_ipsec_connection_tunnels.tunnels[each.key].ip_sec_connection_tunnels[
-  0
+    0
   ].id
   routing = "STATIC"
 
@@ -255,19 +268,19 @@ resource "oci_core_instance" "free_instance" {
 
 resource "null_resource" "ansible" {
   provisioner "local-exec" {
-    command     = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ${var.user} -i ${join(",", [for instance in oci_core_instance.free_instance: instance.public_ip])} --private-key ${var.pvt_key_path} ${var.ansible_playbook_name} -e deployment_user=${var.user} -e cert_directory=${var.cert_directory}"
+    command     = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ${var.user} -i ${join(",", [for instance in oci_core_instance.free_instance : instance.public_ip])} --private-key ${var.pvt_key_path} ${var.ansible_playbook_name} -e deployment_user=${var.user} -e cert_directory=${var.cert_directory}"
     working_dir = var.ansible_repo_path
   }
 }
 
 resource "oci_artifacts_container_repository" "container_repository" {
-  for_each       = toset(var.container_registries)
+  for_each = toset(var.container_registries)
   #Required
   compartment_id = var.compartment_id
   display_name   = each.key
   #Optional
-  is_immutable   = false
-  is_public      = false
+  is_immutable = false
+  is_public    = false
 }
 
 terraform {
@@ -283,3 +296,4 @@ terraform {
     force_path_style            = true
   }
 }
+

@@ -11,46 +11,27 @@ provider "docker" {
   ssh_opts = ["-i", var.pvt_key_path]
 }
 
-resource "docker_image" "pihole" {
-  name = "pihole/pihole:${var.pihole_version}"
+resource "docker_image" "adguard" {
+  name = "adguard/adguardhome:${var.adguard_version}"
 }
 
-resource "docker_image" "cloudflared" {
-  name = "cloudflare/cloudflared:${var.cloudflared_version}"
-}
-
-resource "docker_volume" "pihole" {
-  for_each = toset(["pihole-config", "pihole-dnsmasq-config"])
+resource "docker_volume" "adguard" {
+  for_each = toset(["adguard-data", "adguard-conf"])
   name     = each.key
 }
 
-resource "docker_container" "cloudflared" {
-  image        = docker_image.cloudflared.image_id
-  name         = "cloudflared"
+resource "docker_container" "adguard" {
+  image        = docker_image.adguard.image_id
+  name         = "adguard"
   network_mode = "host"
   restart      = "unless-stopped"
-  command      = ["proxy-dns", "--port", "5053"]
-}
-
-resource "docker_container" "pihole" {
-  image        = docker_image.pihole.image_id
-  name         = "pihole"
-  network_mode = "host"
-  restart      = "unless-stopped"
-  env = [
-    "TZ=${var.tz}",
-    "PIHOLE_DNS_=;127.0.0.1#5053",
-    "WEBPASSWORD=${var.pihole_password}",
-    "DNSMASQ_LISTENING=all",
-    "DNSMASQ_USER=root"
-  ]
   volumes {
-    container_path = "/etc/pihole/"
-    volume_name    = docker_volume.pihole["pihole-config"].name
+    container_path = "/opt/adguardhome/work"
+    volume_name    = docker_volume.adguard["adguard-data"].name
   }
   volumes {
-    container_path = "/etc/dnsmasq.d/"
-    volume_name    = docker_volume.pihole["pihole-dnsmasq-config"].name
+    container_path = "/opt/adguardhome/conf"
+    volume_name    = docker_volume.adguard["adguard-conf"].name
   }
 }
 
