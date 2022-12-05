@@ -3,7 +3,7 @@ variable "traefik_version" {
   default = "v2.9.5"
 }
 variable "whoogle_version" {
-  default = "0.7.4"
+  default = "0.8.0"
 }
 variable "tz" {
   default = "America/Denver"
